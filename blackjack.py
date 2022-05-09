@@ -62,25 +62,24 @@ user_bank = 1000
 def place_bets(user_name,user_bank):
     bet = -1
     count = 1
-    while bet>user_bank or bet<0:
+    while bet>user_bank or bet<=0:
         if count>1:
             print("Not valid Input\n")
+        count += 1
+        bet = float(input(f"Place the amount to bet this round. Press a/A to go All-in.\n{user_name}: ${user_bank}\n->" ))
 
-        bet = input(f"Place the amount to bet this round. Press a/A to go All-in.\n{user_name}: ${user_bank}\n->" )
+    if isinstance(bet,str):
+        if bet.lower() == 'a':
+            bet = user_bank
+            return bet,user_bank
+    try:
+        bet = float(bet)
+        user_bank = user_bank - bet
+    except:
+        bet = -1
 
-        if isinstance(bet,str):
-            if bet.lower() == 'a':
-                bet = user_bank
-                return bet,user_bank
-        try:
-            bet = float(bet)
-        except:
-            bet = -1
-        count+=1
 
     return bet,user_bank
-
-place_bets(user_name,user_bank)
 
 
 # Definition of the random cards picker
@@ -98,32 +97,17 @@ def random_card(all_cards):
 
     return selected_card
 
+###########################################
 
-card = random_card(all_cards)
-print(card)
-time.sleep(2)
-print('acabou a espera')
+end_game = False
+while not end_game:
+
+    bet, user_bank = place_bets(user_name,user_bank)
+    print(f"BET: {bet}\nUSER BANK: {user_bank}")
 
 
-# ###########################################
-#
-# end_game = False
-# while not end_game:
-#
-#     bet = place_bets(user_name,user_bank)
-#
-#     key1 ,value1 ,all_cards, count = random_card(all_cards, n_of_decks,count)
-#
-#     key2 ,value2 ,all_cards, count = random_card(all_cards, n_of_decks,count)
-#
-#     if key1 == None or key2 == None:
-#         print("SHUFFLING")
-#         all_cards = full_deck_generator()
-#         key1, value1, all_cards = random_card(all_cards, n_of_decks, count)
-#         key2, value2, all_cards = random_card(all_cards, n_of_decks, count)
-#
-#     print(f"your cards are {key1} {key2} and you have {value1+value2}")
-#
-#
-#
-#
+
+    if user_bank ==0:
+        end_game = True
+        print("BUSTED!")
+
