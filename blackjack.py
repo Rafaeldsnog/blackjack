@@ -105,6 +105,17 @@ while not end_game:
     bet, user_bank = place_bets(user_name,user_bank)
     print(f"BET: {bet}\nUSER BANK: {user_bank}")
 
+    # INITIAL CARDS DELT
+
+    dealer_1 = random_card(all_cards)
+    dealer_2 = random_card(all_cards)
+    user_1 = random_card(all_cards)
+    user_2 = random_card(all_cards)
+
+    print(f"\nDEALER: {dealer_1} * \n")
+    print(f"USER: {user_1}, {user_2}\n")
+
+    
 
 
     if user_bank ==0:
