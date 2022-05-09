@@ -1,9 +1,11 @@
 import sys
 import random
+import time
 ############################################################
 #Creation of the deck and list tuples with values for each card
 
 global full_deck
+global all_cards
 
 def full_deck_generator():
     suits = ['h','d','c','s']
@@ -47,6 +49,9 @@ all_cards = []
 for ii in range(n_of_decks-1):
     for jj in full_deck_values:
         all_cards.append(jj)
+
+initial_deck = all_cards
+initial_len = len(all_cards)
 #print(all_cards)
 #####################################################################
 
@@ -79,34 +84,27 @@ place_bets(user_name,user_bank)
 
 
 # Definition of the random cards picker
-# count = n_of_decks*52
-# def random_card(all_cards, n_of_decks, count):
-#     count = count-1
-#     if count < 0.6*n_of_decks*52:
-#         all_cards = full_deck_generator()
-#         key = None
-#         value = None
-#         count = n_of_decks*52
-#         return key, value, all_cards, count
-#
-#     deck_index = random.randint(0 , n_of_decks-1)
-#
-#     len_deck = len(all_cards[deck_index])
-#
-#     if len_deck ==0:
-#         del all_cards[deck_index]
-#         n_of_decks -= 1
-#         random_card(all_cards,n_of_decks, count)
-#
-#     card_index = random.randint(0,len_deck-1)
-#
-#     key,value = all_cards[deck_index][card_index]
-#
-#     del all_cards[deck_index][card_index]
-#
-#     return key, value, all_cards, count
-#     #pick a random card from the list in dict
-#
+
+def random_card(all_cards):
+
+    if len(all_cards) < 0.5*initial_len:
+        all_cards = initial_deck
+        print("SHUFFLING! ")
+        time.sleep(2)
+        # INSERT HERE THE CARD COUNTING RESET
+
+    selected_card = random.choice(all_cards)
+    all_cards.remove(selected_card)
+
+    return selected_card
+
+
+card = random_card(all_cards)
+print(card)
+time.sleep(2)
+print('acabou a espera')
+
+
 # ###########################################
 #
 # end_game = False
