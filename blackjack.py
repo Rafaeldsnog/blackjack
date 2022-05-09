@@ -66,17 +66,21 @@ def place_bets(user_name,user_bank):
         if count>1:
             print("Not valid Input\n")
         count += 1
-        bet = float(input(f"Place the amount to bet this round. Press a/A to go All-in.\n{user_name}: ${user_bank}\n->" ))
+        bet = input(f"Place the amount to bet this round. Press a/A to go All-in or k/K to cash out.\n{user_name}: ${user_bank}\n->" )
 
-    if isinstance(bet,str):
+
         if bet.lower() == 'a':
             bet = user_bank
+            user_bank = 0
             return bet,user_bank
-    try:
-        bet = float(bet)
-        user_bank = user_bank - bet
-    except:
-        bet = -1
+        elif bet.lower()=='k':
+            return bet,user_bank
+
+        try:
+            bet = float(bet)
+            user_bank = user_bank - bet
+        except:
+            bet = -1
 
 
     return bet,user_bank
@@ -103,6 +107,12 @@ end_game = False
 while not end_game:
 
     bet, user_bank = place_bets(user_name,user_bank)
+
+    if isinstance(bet,str):
+        if bet.lower() == 'k':
+            print(f"Cash Out: {user_bank}.")
+            quit()
+
     print(f"BET: {bet}\nUSER BANK: {user_bank}")
 
     # INITIAL CARDS DELT
