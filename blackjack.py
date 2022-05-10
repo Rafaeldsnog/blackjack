@@ -1,4 +1,5 @@
 import sys
+import os
 import random
 import time
 ############################################################
@@ -101,11 +102,60 @@ def random_card(all_cards):
 
     return selected_card
 
+def hit(user_cards,user_score):
+    new_card = random_card(all_cards)
+    user_cards.append(new_card)
+    user_score += new_card[1]
+    return user_cards, user_score
+
+def dealer_game(dealer_cards, dealer_score):
+    end_dealer = False
+    while not end_dealer:
+        if dealer_score <17:
+            new_card = random_card(all_cards)
+            dealer_cards.append(new_card)
+            dealer_score += new_card[1]
+            print(f"DEALER CARDS: {dealer_cards}. DEALER SCORE: {dealer_score}")
+            time.sleep(1.5)
+
+        elif dealer_score>=17 and dealer_score<=21:
+            end_dealer = True
+            time.sleep(1)
+            return dealer_cards, dealer_score
+        else:
+            time.sleep(1)
+            end_dealer = True
+            return dealer_cards, dealer_score
+
+
+def game_development(user_cards,user_score):
+    end_round = False
+    while not end_round:
+        option = input("H/h -> hit; D/d -> double; any -> stand")
+        if option.lower() =='h':
+            user_cards, user_score = hit(user_cards,user_score)
+            print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
+            if user_score == 21:
+                end_round = True
+            elif user_score >21:
+                end_round = True
+            else:
+                pass
+        elif option.lower() =='d':
+            user_cards, user_score = hit(user_cards, user_score)
+            end_round = True
+        else:
+            end_round = True
+    return option, user_cards, user_score
+
+
 ###########################################
+# GAME DEVELOPMENT
 
 end_game = False
 while not end_game:
-
+    time.sleep(2)
+    os.system('cls')
     bet, user_bank = place_bets(user_name,user_bank)
 
     if isinstance(bet,str):
@@ -122,10 +172,48 @@ while not end_game:
     user_1 = random_card(all_cards)
     user_2 = random_card(all_cards)
 
-    print(f"\nDEALER: {dealer_1} * \n")
-    print(f"USER: {user_1}, {user_2}\n")
+    print(f"\nCARDS: {len(all_cards)}\n")
+    print(f"DEALER: {dealer_1[0]} *\n")
+    print(f"USER: {user_1[0]}  {user_2[0]}\n")
+    user_score = user_1[1] + user_2[1]
+    dealer_score = dealer_1[1] + dealer_2[1]
+    print(f"SCORE: {user_1[1] + user_2[1]}")
 
-    
+    user_cards = [user_1,user_2]
+    dealer_cards = [dealer_1,dealer_2]
+
+
+    if user_1[1] == user_2[1]:
+        option = input("H/h -> hit; D/d -> double; S/s -> stand; P/p -> split")
+        if option.lower() == 'p':
+            user_3 = random_card(all_cards)
+            user_4 = random_card(all_cards)
+            game_1 = [user_1,user_3]
+            score_1 = user_1[1] + user_3[1]
+            game_2 = [user_2, user_4]
+            score_2 = user_2[1] + user_4[1]
+
+            option, user_cards, user_score = game_development(game_1,score_1)
+
+            option, user_cards, user_score = game_development(game_2,score_2)
+
+    else:
+        option, user_cards, user_score = game_development(user_cards, user_score)
+        if user_score>21:
+            print("BUSTED")
+            print(dealer_cards)
+            print(f"DEALER SCORE: {dealer_1[1] + dealer_2[1]}")
+            user_bank -=bet
+        else:
+            dealer_cards, dealer_score = dealer_game(dealer_cards,dealer_score)
+            if dealer_score>user_score:
+                print("YOU LOOSE!")
+                user_bank -= bet
+            elif user_score>dealer_score:
+                print("YOU WIN!")
+                user_bank += bet
+            else:
+                print("PUSH")
 
 
     if user_bank ==0:
