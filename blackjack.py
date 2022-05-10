@@ -3,11 +3,11 @@ import os
 import random
 import time
 ############################################################
-#Creation of the deck and list tuples with values for each card
 
+# DECLARATION OF GLOBAL VARIABLES
 global full_deck
-global all_cards
 
+#Creation of the deck and list tuples with values for each card
 def full_deck_generator():
     suits = ['h','d','c','s']
     cards_faces = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
@@ -38,22 +38,29 @@ user_name = input("What is your name?\n-> ")
 # VERIFICATION AND INPUT OF THE NUMBER OF DECKS TO BE PLAYED
 
 n_of_decks = 0
-while n_of_decks <6 or n_of_decks >8:
+while n_of_decks <1 or n_of_decks >8:
     try:
-        n_of_decks = int(input("Choose number of decks(6~8): "))
+        n_of_decks = int(input("\nChoose number of decks(1~8): "))
     except ValueError:
         print("Not Valid input ")
 
 ####################################################################
 # Creating all the cards to be played dict in list of tuples
 all_cards = []
-for ii in range(n_of_decks-1):
+if n_of_decks ==1:
     for jj in full_deck_values:
         all_cards.append(jj)
+    initial_deck = all_cards
+    initial_len = len(all_cards)
 
-initial_deck = all_cards
-initial_len = len(all_cards)
-#print(all_cards)
+else:
+    for ii in range(n_of_decks-1):
+        for jj in full_deck_values:
+            all_cards.append(jj)
+
+    initial_deck = all_cards
+    initial_len = len(all_cards)
+print(all_cards)
 #####################################################################
 
 # USER INITIAL BANKROLL
@@ -63,11 +70,11 @@ user_bank = 1000
 def place_bets(user_name,user_bank):
     bet = -1
     count = 1
-    while bet>user_bank or bet<=0:
+    while bet>user_bank or bet<0:
         if count>1:
             print("Not valid Input\n")
         count += 1
-        bet = input(f"Place the amount to bet this round. Press a/A to go All-in or k/K to cash out.\n{user_name}: ${user_bank}\n->" )
+        bet = input(f"Place the amount to bet this round (press a/A to go All-in or k/K to cash out).\n{user_name}: ${user_bank}\n-> $" )
 
 
         if bet.lower() == 'a':
@@ -79,8 +86,11 @@ def place_bets(user_name,user_bank):
 
         try:
             bet = float(bet)
+            if bet ==0:
+                return bet,user_bank
             user_bank = user_bank - bet
         except:
+            print("Not valid input!")
             bet = -1
 
 
@@ -89,8 +99,8 @@ def place_bets(user_name,user_bank):
 
 # Definition of the random cards picker
 
-def random_card(all_cards):
-
+def random_card():
+    global all_cards
     if len(all_cards) < 0.5*initial_len:
         all_cards = initial_deck
         print("SHUFFLING! ")
@@ -103,7 +113,7 @@ def random_card(all_cards):
     return selected_card
 
 def hit(user_cards,user_score):
-    new_card = random_card(all_cards)
+    new_card = random_card()
     user_cards.append(new_card)
     user_score += new_card[1]
     return user_cards, user_score
@@ -112,7 +122,7 @@ def dealer_game(dealer_cards, dealer_score):
     end_dealer = False
     while not end_dealer:
         if dealer_score <17:
-            new_card = random_card(all_cards)
+            new_card = random_card()
             dealer_cards.append(new_card)
             dealer_score += new_card[1]
             print(f"DEALER CARDS: {dealer_cards}. DEALER SCORE: {dealer_score}")
@@ -120,9 +130,11 @@ def dealer_game(dealer_cards, dealer_score):
 
         elif dealer_score>=17 and dealer_score<=21:
             end_dealer = True
+            print(f"DEALER CARDS: {dealer_cards}. DEALER SCORE: {dealer_score}")
             time.sleep(1)
             return dealer_cards, dealer_score
         else:
+            print(f"DEALER CARDS: {dealer_cards}. DEALER SCORE: {dealer_score}")
             time.sleep(1)
             end_dealer = True
             return dealer_cards, dealer_score
@@ -167,10 +179,10 @@ while not end_game:
 
     # INITIAL CARDS DELT
 
-    dealer_1 = random_card(all_cards)
-    dealer_2 = random_card(all_cards)
-    user_1 = random_card(all_cards)
-    user_2 = random_card(all_cards)
+    dealer_1 = random_card()
+    dealer_2 = random_card()
+    user_1 = random_card()
+    user_2 = random_card()
 
     print(f"\nCARDS: {len(all_cards)}\n")
     print(f"DEALER: {dealer_1[0]} *\n")
@@ -186,8 +198,8 @@ while not end_game:
     if user_1[1] == user_2[1]:
         option = input("H/h -> hit; D/d -> double; S/s -> stand; P/p -> split")
         if option.lower() == 'p':
-            user_3 = random_card(all_cards)
-            user_4 = random_card(all_cards)
+            user_3 = random_card()
+            user_4 = random_card()
             game_1 = [user_1,user_3]
             score_1 = user_1[1] + user_3[1]
             game_2 = [user_2, user_4]
@@ -204,8 +216,23 @@ while not end_game:
             print(dealer_cards)
             print(f"DEALER SCORE: {dealer_1[1] + dealer_2[1]}")
             user_bank -=bet
+        elif user_score ==21:
+            dealer_cards, dealer_score = dealer_game(dealer_cards,dealer_score)
+            if dealer_score == 21:
+                print("PUSH!")
+                time.sleep(2)
+            elif dealer_score > 21:
+                print("YOU WIN!")
+                user_bank += bet
+            else:
+                print("YOU WIN!")
+                user_bank += bet
+
         else:
             dealer_cards, dealer_score = dealer_game(dealer_cards,dealer_score)
+            if dealer_score>21:
+                print("YOU WIN!")
+                user_bank += bet
             if dealer_score>user_score:
                 print("YOU LOOSE!")
                 user_bank -= bet
