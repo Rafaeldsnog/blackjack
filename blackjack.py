@@ -79,7 +79,6 @@ def place_bets(user_name,user_bank):
 
         if bet.lower() == 'a':
             bet = user_bank
-            user_bank = 0
             return bet,user_bank
         elif bet.lower()=='k':
             return bet,user_bank
@@ -88,7 +87,6 @@ def place_bets(user_name,user_bank):
             bet = float(bet)
             if bet ==0:
                 return bet,user_bank
-            user_bank = user_bank - bet
         except:
             print("Not valid input!")
             bet = -1
@@ -105,6 +103,7 @@ def random_card():
         all_cards = initial_deck
         print("SHUFFLING! ")
         time.sleep(2)
+        return
         # INSERT HERE THE CARD COUNTING RESET
 
     selected_card = random.choice(all_cards)
@@ -147,18 +146,33 @@ def dealer_game(dealer_cards, dealer_score):
 def user_game(user_cards,user_score):
     end_round = False
     while not end_round:
-        option = input("H/h -> hit; D/d -> double; any -> stand")
+        option = input("H/h -> hit; D/d -> double; any -> stand\n->")
         if option.lower() =='h':
             user_cards, user_score = hit(user_cards,user_score)
-            print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
-            if user_score >= 21:
-                end_round = True
+            if user_score > 21:
+                for index, card in enumerate(user_cards):
+                    if ("A" in card[0]) and card[1] == 11:
+                        user_cards[index] = (card[0], 1)
+                        user_score-=10
+                        print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
+                        user_game(user_cards,user_score)
+                    else:
+                        print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
+                        return user_cards, user_score
+            elif user_score ==21:
+                print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
+                return user_cards, user_score
+
+            else:
+                print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
+
 
         elif option.lower() =='d':
             user_cards, user_score = hit(user_cards, user_score)
-            bet = bet*2
+            print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
             end_round = True
         else:
+            print(f"USER CARDS: {user_cards}. USER SCORE: {user_score}")
             end_round = True
     return user_cards, user_score
 
@@ -201,18 +215,19 @@ while not end_game:
     if user_score >21:
         print("BUSTED!")
         print(f"DEALER CARDS: {dealer_cards} DEALER SCORE: {dealer_score}")
+        user_bank -= bet
         time.sleep(1.5)
 
     else:
         dealer_cards, dealer_score = dealer_game(dealer_cards,dealer_score)
         if dealer_score>21:
             print("YOU WON!")
-            user_bank += 2*bet
+            user_bank += bet
             time.sleep(1.5)
 
         elif user_score>dealer_score:
             print("YOU WON!")
-            user_bank += 2*bet
+            user_bank += bet
             time.sleep(1.5)
 
         elif user_score == dealer_score:
@@ -221,6 +236,7 @@ while not end_game:
 
         else:
             print("YOU LOOSE!")
+            user_bank -= bet
             time.sleep(1.5)
 
     if user_bank ==0:
