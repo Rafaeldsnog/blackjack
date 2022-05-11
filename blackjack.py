@@ -103,7 +103,6 @@ def random_card():
         all_cards = initial_deck
         print("SHUFFLING! ")
         time.sleep(2)
-        return
         # INSERT HERE THE CARD COUNTING RESET
 
     selected_card = random.choice(all_cards)
@@ -120,6 +119,8 @@ def hit(user_cards,user_score):
 def dealer_game(dealer_cards, dealer_score):
     end_dealer = False
     count_d = 0
+    print("\nDEALER GAME")
+    time.sleep(1.5)
     while not end_dealer:
         if dealer_score <17:
             new_card = random_card()
